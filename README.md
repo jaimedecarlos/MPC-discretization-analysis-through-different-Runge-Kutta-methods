@@ -23,7 +23,7 @@ As a takeaway from this specific example, the higher the degree of the RK method
 
 The second display called "Trajectory according to different models" creates a 3-graph feature that explains the evolution of the position prediction according to the executed inputs for each model. The linearized model around $\theta=0$ is the least accurate comparing it with the ODE solver solution (blue). As for the value marked on top of each graph called "Cost=_" indicates the terminal cost of each minimization problem for MPC. 
 
-This example shows better performance for prediction of state and cost function for the higher degree methods. 
+This example shows better performance for prediction of state and optimal cost function for the higher degree methods. 
 
 # Mathematical proof
 
