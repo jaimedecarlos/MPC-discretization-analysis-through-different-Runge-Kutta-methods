@@ -1,0 +1,114 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+
+\title{MPC project - Changing Discretization Tools}
+\author{Jaime de Carlos}
+\date{November 2025}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+\subsection{1st order Runge-Kutta method (Euler)}
+\noindent
+This is the actual approach of the subject to the discretization of the physical model. \\\\
+Given a physical system defined by: 
+\begin{equation}\label{eq1}
+    \dot{x}=g(x,u)
+\end{equation}
+we have by the definition of the Euler method: 
+\begin{equation}
+    x_{k+1}=x_{k}+Ts*g(x_k,u_k)
+\end{equation}
+This is a first order Runge-Kutta (RK) method as it only takes one previous iteration to calculate the next, and it is the simplest and least precise RK method there is. We propose to implement for MPC controllers a more precise RK method for the discretization of the variables. \\\\
+\subsection{2nd order Runge-Kutta method}\label{Heun}
+With a second order RK method, we will need two measurements of the $g(x,u)$ function to get a result.\\\\
+For the sake of indexing, and to keep all measurements inside the mesh as in the Euler method, we propose the use of Heun's method. Because other RK methods evaluate the function in points outside the mesh, for simplicity reasons, we chose Heun's method.\\\\
+\begin{figure}[h]
+    \centering
+    \[
+    \renewcommand\arraystretch{1.2}
+    \begin{array}
+        {c|cc}
+        0\\
+        1 & 1\\
+        \hline
+        & \frac{1}{2} &\frac{1}{2}  
+    \end{array}
+    \]
+
+    \caption{Heun's method Butcher table}
+    \label{fig:enter-label}
+\end{figure}
+Given that the function defined in (\ref{eq1}) is time invariant, we can define the Heun's method for our problem by the following:
+
+
+\[
+\left\{
+\begin{array}{rcl}
+    k_1&=&g(x_i,u_i)\\
+    k_2&=&g(x_i+k_1\cdot·Ts,u_i)\\
+    x_{i+1}&=&x_i+\frac{Ts}{2}(k_1+k_2)
+\end{array}
+\right.
+\]
+Considering the linearized system: 
+\begin{equation}
+    g(x,u)=A^cx+B^cu
+\end{equation}
+we have: 
+\[
+\left\{
+\begin{array}{rcl}
+    k_1&=&A^cx_i+B^cu_i\\
+    k_2&=&A^c(x_i+k_1\cdot·Ts)+B^cu_i\\
+    x_{i+1}&=&x_i+\frac{Ts}{2}(k1+k2)
+\end{array}
+\right.
+\]
+Operating: 
+\[
+\left\{
+\begin{array}{rcl}
+    x_{i+1}&=&A^Hx_i+B^Hu_i\\
+    A^H&=&I_N+Ts\cdot·A^c+\frac{Ts^2(A^c)^2}{2}\\
+    B^H&=&Ts\cdot·B^c+\frac{Ts^2\cdot·A^cB^c}{2}
+    
+\end{array}
+\right.
+\]
+\subsection{4th order Runge-Kutta method}
+We will do the same procedure for the RK4 method: 
+\begin{figure}[h]
+    \centering
+    \[
+    \renewcommand\arraystretch{1.2}
+    \begin{array}
+        {c|cccc}
+        0\\
+        \frac{1}{2} &\frac{1}{2}\\
+        \frac{1}{2} & 0&\frac{1}{2}\\
+        1 & 0&0&1\\
+        \hline
+        & \frac{1}{6} & \frac{1}{3}  &\frac{1}{3}&\frac{1}{6}
+    \end{array}
+    \]
+
+    \caption{RK4 method Butcher table}
+    \label{fig:enter-label}
+\end{figure}\\
+We will spare the calculus, as it is a similar procedure to the one made in section \ref{Heun}.
+\[
+\left\{
+\begin{array}{rcl}
+    x_{i+1}&=&A^{RK4}\cdot·x_i+B^{RK4}\cdot·u_i\\
+    A^{RK4}&=&I_N+Ts\cdot·A^c+\frac{Ts^2}{2}(A^c)^2+\frac{Ts^3}{6}(A^c)^3+\frac{Ts^4}{24}(A^c)^4\\
+    B^{RK4}&=&Ts\cdot·B^c+\frac{Ts^2}{2}A^cB^c+\frac{Ts^3}{6}(A^c)^2B^c+\frac{Ts^4}{24}(A^c)^3B^c
+    
+\end{array}
+\right.
+\]
+
+\end{document}
