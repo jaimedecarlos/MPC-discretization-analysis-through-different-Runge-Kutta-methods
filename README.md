@@ -27,6 +27,6 @@ This example shows better performance for prediction of state and cost function 
 
 # Mathematical proof
 
-See text file
+See pdf file
 
 
